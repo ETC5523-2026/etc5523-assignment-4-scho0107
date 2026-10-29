@@ -1,2 +1,32 @@
-
-
+Package: vicvisits
+Title: Compare Victorian Public Library Visits per Resident
+Version: 0.1.0
+Authors@R:
+    person("Sum Yee", "Chong", email = "scho0107@student.monash.edu",
+           role = c("aut", "cre"))
+Description: Provides tools for comparing public library visits per resident
+    across Victorian library services from 2022-23 to 2024-25.
+    Includes data prepared from the Public Libraries Victoria Annual
+    Statistical Survey, functions for comparing library services with
+    statewide benchmarks, and an interactive Shiny application for
+    exploring results.
+License: MIT + file LICENSE
+URL: https://github.com/ETC5523-2026/etc5523-assignment-4-scho0107
+BugReports: https://github.com/ETC5523-2026/etc5523-assignment-4-scho0107/issues
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+Depends:
+    R (>= 4.1.0)
+Imports:
+    bslib,
+    dplyr,
+    ggplot2,
+    shiny
+Suggests:
+    knitr,
+    rmarkdown,
+    testthat (>= 3.0.0)
+VignetteBuilder: knitr
+Config/testthat/edition: 3
+LazyData: true
+Config/roxygen2/version: 8.1.1
