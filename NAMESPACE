@@ -2,4 +2,5 @@
 
 export(compare_visits)
 export(plot_visits)
+export(run_app)
 importFrom(bslib,bs_theme)
