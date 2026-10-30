@@ -1,8 +1,8 @@
 library(shiny)
 library(bslib)
-library(vicvisits)
 library(dplyr)
 library(ggplot2)
+library(vicvisits)
 
 # Choices for the inputs come from the data in the package
 services <- sort(unique(library_visits$library_service))
@@ -10,6 +10,7 @@ years <- sort(unique(library_visits$financial_year))
 
 # ---- UI ----
 ui <- page_sidebar(
+  # Let the page scroll instead of squeezing every card onto one screen
   fillable = FALSE,
   title = "Library visits per resident: how does your service compare with Victoria?",
   sidebar = sidebar(
@@ -22,8 +23,44 @@ ui <- page_sidebar(
       "year", "2. Choose a financial year",
       choices = years,
       selected = "2024-25"
+    ),
+    div(
+      class = "help-text",
+      h5("How to use this app"),
+      p(
+        strong("Library service"), " changes every output: the summary,",
+        " the trend chart and the highlighted bar in the ranking chart."
+      ),
+      p(
+        strong("Financial year"), " changes the summary numbers and the",
+        " ranking chart. The trend chart always shows all three years."
+      ),
+      h5("What the fields mean"),
+      p(
+        strong("Visits per resident"), " = branch visits + mobile library",
+        " visits, divided by the council population."
+      ),
+      p(
+        strong("Victoria"), " = all library visits in Victoria divided by",
+        " the Victorian population. It is not an average of the 50 services."
+      ),
+      p(strong("Rank"), " = position among services that reported data (1 = highest).")
     )
   ),
+
+  # Who the app is for and what it answers
+  div(
+    class = "app-question",
+    p(
+      strong("For: "), "council library service managers in Victoria."
+    ),
+    p(
+      strong("Question: "), "How do my service's library visits per resident",
+      " compare with the Victorian figure, and has the gap changed from",
+      " 2022-23 to 2024-25?"
+    )
+  ),
+
   layout_columns(
     fill = FALSE,
     value_box(
@@ -45,24 +82,72 @@ ui <- page_sidebar(
       theme = "light"
     )
   ),
+
   card(
     card_header("What this means"),
     uiOutput("summary_text")
   ),
+
   card(
     card_header("Has the gap with Victoria changed over time?"),
-    plotOutput("trend_plot")
+    plotOutput("trend_plot", height = "380px"),
+    p(
+      class = "how-to-read",
+      "How to read: the blue line is your service and the grey dashed line is",
+      " Victoria. If the blue line sits above the grey line, your service had",
+      " more visits per resident than the state. If the gap gets wider over",
+      " time, your service is moving further from the statewide figure.",
+      " A missing point means the service did not report data that year."
+    )
   ),
+
   card(
     card_header(textOutput("rank_header")),
-    plotOutput("rank_plot", height = "820px")
+    plotOutput("rank_plot", height = "820px"),
+    p(
+      class = "how-to-read",
+      "How to read: each bar is one library service, sorted from most to",
+      " fewest visits per resident. Your service is blue and the dashed line",
+      " is the Victorian figure. Services to the right of the line are above",
+      " the statewide figure."
+    )
+  ),
+
+  card(
+    card_header("Before you use these numbers"),
+    tags$ul(
+      tags$li(
+        "Visits count entries to a library, not different people. One",
+        " person who visits every week counts many times."
+      ),
+      tags$li(
+        "Councils with many workers, students or tourists (such as Melbourne",
+        " or Yarra) can have high visits per resident because people who live",
+        " elsewhere also use their libraries."
+      ),
+      tags$li(
+        "Indigo (2022-23) and Towong (2022-23 and 2023-24) did not report",
+        " data. PLV used estimates for these, which this app does not show."
+      ),
+      tags$li(
+        "Cardinia Shire moved from Casey-Cardinia Libraries to Myli in",
+        " December 2022. Comparisons involving 2022-23 for these services",
+        " should be treated with caution."
+      ),
+      tags$li(
+        "Data are reported by each library service. Source: Public Libraries",
+        " Victoria Annual Statistical Survey, Final Datasets 2022-23 to",
+        " 2024-25 (data \u00a9 Public Libraries Victoria)."
+      )
+    )
   )
 )
 
 # ---- Server ----
 server <- function(input, output, session) {
 
-  # Comparison table for the chosen service (all three years)
+  # Comparison table for the chosen service (all three years).
+  # compare_visits() is the exported function from the vicvisits package.
   comparison <- reactive({
     validate(need(
       input$service != "",
@@ -179,14 +264,28 @@ server <- function(input, output, session) {
       )
     }
 
-    tagList(p(first_sentence), p(second_sentence))
+    # Extra warning for the two services affected by the 2022 change
+    split_note <- NULL
+    if (input$service %in% c("Connected Libraries", "Myli")) {
+      split_note <- p(
+        class = "caution",
+        "Note: Cardinia Shire moved from Casey-Cardinia Libraries to Myli",
+        " on 1 December 2022. This changed the areas served, so comparisons",
+        " involving 2022-23 should be treated with caution."
+      )
+    }
+
+    tagList(p(first_sentence), p(second_sentence), split_note)
   })
 
   # ---- Trend chart ----
   output$trend_plot <- renderPlot({
     req(comparison())
-    plot_visits(input$service)
+    # plot_visits() is the exported plotting function from vicvisits
+    plot_visits(input$service) +
+      labs(title = NULL)
   })
+
   # ---- Ranking chart ----
   output$rank_header <- renderText({
     req(input$service)
