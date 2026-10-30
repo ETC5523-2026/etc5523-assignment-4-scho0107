@@ -2,6 +2,7 @@ library(shiny)
 library(bslib)
 library(vicvisits)
 library(dplyr)
+library(ggplot2)
 
 # Choices for the inputs come from the data in the package
 services <- sort(unique(library_visits$library_service))
@@ -51,6 +52,10 @@ ui <- page_sidebar(
   card(
     card_header("Has the gap with Victoria changed over time?"),
     plotOutput("trend_plot")
+  ),
+  card(
+    card_header(textOutput("rank_header")),
+    plotOutput("rank_plot", height = "820px")
   )
 )
 
@@ -181,6 +186,61 @@ server <- function(input, output, session) {
   output$trend_plot <- renderPlot({
     req(comparison())
     plot_visits(input$service)
+  })
+  # ---- Ranking chart ----
+  output$rank_header <- renderText({
+    req(input$service)
+    paste0("Where does ", input$service, " sit among all services in ", input$year, "?")
+  })
+
+  output$rank_plot <- renderPlot({
+    validate(need(
+      input$service != "",
+      "Choose a library service in the sidebar to see where it ranks."
+    ))
+
+    # All services that reported data in the chosen year
+    year_data <- library_visits |>
+      filter(financial_year == input$year, reported) |>
+      mutate(
+        focus = if_else(library_service == input$service, "Your service", "Other services"),
+        library_service = reorder(library_service, visits_per_person)
+      )
+
+    vic_rate <- vic_visits |>
+      filter(financial_year == input$year) |>
+      pull(visits_per_person)
+
+    rank_subtitle <- paste0(
+      "Dashed line: Victoria (", sprintf("%.2f", vic_rate), " visits per resident)"
+    )
+    if (!input$service %in% year_data$library_service) {
+      rank_subtitle <- paste0(
+        rank_subtitle, ". ", input$service, " is not shown because it did not",
+        " report data for ", input$year, "."
+      )
+    }
+
+    ggplot(year_data, aes(visits_per_person, library_service, fill = focus)) +
+      geom_col() +
+      geom_vline(xintercept = vic_rate, linetype = "dashed", colour = "#333333") +
+      scale_fill_manual(
+        values = c("Your service" = "#006DAE", "Other services" = "#C8C8C8"),
+        guide = "none"
+      ) +
+      scale_x_continuous(expand = expansion(mult = c(0, 0.05))) +
+      labs(
+        # Wrap long subtitles so they fit the chart width
+        subtitle = paste(strwrap(rank_subtitle, width = 85), collapse = "\n"),
+        x = "Library visits per resident",
+        y = NULL
+      ) +
+      theme_minimal(base_size = 14) +
+      theme(
+        panel.grid.major.y = element_blank(),
+        panel.grid.minor = element_blank(),
+        plot.subtitle = element_text(colour = "#444444")
+      )
   })
 }
 
