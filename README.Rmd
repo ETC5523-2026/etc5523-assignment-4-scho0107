@@ -109,3 +109,6 @@ summaries, with attribution to Public Libraries Victoria. To recreate them,
 run `data-raw/library_visits.R`, which downloads the original file directly
 from the PLV website.
 
+## AI-use declaration
+
+I used ChatGPT to help me understand the assignment requirements and plan the structure of my R package, Shiny app and documentation. It helped me understand Shiny reactive expressions and how to display missing library service data correctly in the app. I also used ChatGPT to troubleshoot technical issues I encountered during development, such as R functions not being found, Git staging and commit errors, and problems with publishing the pkgdown website. I used it to review parts of my code and improve the wording, layout and styling of the app and documentation. I reviewed and revised the suggestions, made my own decisions about the final implementation, and tested the package and results in R.
