@@ -1,0 +1,29 @@
+
+url: https://etc5523-2026.github.io/etc5523-assignment-4-scho0107/
+
+template:
+  bootstrap: 5
+  bootswatch: cosmo
+  bslib:
+    primary: "#006DAE"
+
+navbar:
+  structure:
+    left: [intro, reference, articles]
+    right: [search, github]
+
+reference:
+  - title: "Launch the app"
+    contents:
+      - run_app
+  - title: "Compare a library service with Victoria"
+    contents:
+      - compare_visits
+      - plot_visits
+  - title: "Data"
+    contents:
+      - library_visits
+      - vic_visits
+  - title: "Package"
+    contents:
+      - vicvisits-package
