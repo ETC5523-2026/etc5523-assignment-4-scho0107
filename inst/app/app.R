@@ -13,7 +13,16 @@ ui <- page_sidebar(
   # Let the page scroll instead of squeezing every card onto one screen
   fillable = FALSE,
   title = "Library visits per resident: how does your service compare with Victoria?",
+  theme = bs_theme(
+    version = 5,
+    primary = "#006DAE",
+    base_font = "Arial",
+    font_scale = 1.05
+  ),
+  tags$head(tags$link(rel = "stylesheet", href = "styles.css")),
+
   sidebar = sidebar(
+    width = 320,
     selectInput(
       "service", "1. Choose your library service",
       choices = c("Type or pick a service" = "", services),
@@ -84,11 +93,13 @@ ui <- page_sidebar(
   ),
 
   card(
+    class = "summary-card",
     card_header("What this means"),
     uiOutput("summary_text")
   ),
 
   card(
+    full_screen = TRUE,
     card_header("Has the gap with Victoria changed over time?"),
     plotOutput("trend_plot", height = "380px"),
     p(
@@ -102,6 +113,7 @@ ui <- page_sidebar(
   ),
 
   card(
+    full_screen = TRUE,
     card_header(textOutput("rank_header")),
     plotOutput("rank_plot", height = "820px"),
     p(
@@ -284,7 +296,7 @@ server <- function(input, output, session) {
     # plot_visits() is the exported plotting function from vicvisits
     plot_visits(input$service) +
       labs(title = NULL)
-  })
+  }, res = 96)
 
   # ---- Ranking chart ----
   output$rank_header <- renderText({
@@ -340,7 +352,7 @@ server <- function(input, output, session) {
         panel.grid.minor = element_blank(),
         plot.subtitle = element_text(colour = "#444444")
       )
-  })
+  }, res = 96)
 }
 
 shinyApp(ui, server)

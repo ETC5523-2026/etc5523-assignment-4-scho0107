@@ -1,0 +1,72 @@
+/* Colours used across the app (same blue as the charts) */
+:root {
+  --accent: #006DAE;
+  --ink: #222222;
+  --muted: #555555;
+  --soft: #EEF5FA;
+  --warning: #8A5A00;
+}
+
+body {
+  color: var(--ink);
+  line-height: 1.5;
+}
+
+/* The intended user and question, shown at the top of the page */
+.app-question {
+  border-left: 6px solid var(--accent);
+  background-color: var(--soft);
+  padding: 0.75rem 1rem;
+  border-radius: 4px;
+}
+
+.app-question p {
+  margin-bottom: 0.25rem;
+  font-size: 1.05rem;
+}
+
+/* Sidebar help: smaller and grey so the controls stand out */
+.help-text h5 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin-top: 1rem;
+  color: var(--accent);
+}
+
+.help-text p {
+  font-size: 0.88rem;
+  color: var(--muted);
+  margin-bottom: 0.5rem;
+}
+
+/* Card titles */
+.card-header {
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
+/* The written interpretation is the main result, so make it easy to read */
+.summary-card p {
+  font-size: 1.1rem;
+  max-width: 60rem;
+}
+
+/* "How to read" notes under the charts */
+.how-to-read {
+  font-size: 0.9rem;
+  color: var(--muted);
+  margin: 0.5rem 0 0 0;
+}
+
+/* Messages from validate(), e.g. when a service has no data */
+.shiny-output-error-validation {
+  color: var(--warning);
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+/* Extra warning for services affected by the 2022 change */
+.caution {
+  color: var(--warning);
+  font-size: 0.95rem;
+}
